@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>DAVID B. Simulations</title>
+  <meta name="description" content="Interactive browser simulations by David Boateng. Search the library and play." />
+  <link rel="icon" type="image/png" href="assets/favicon-davidb.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="loader.js"></script>
+</head>
+<body>
+  <div class="loader" id="loader" aria-hidden="true"><img src="assets/davidblogo.png" alt="" width="640" height="491" /><span class="loader-bar"><i></i></span></div>
+  <header class="nav">
+    <a class="brand" href="index.html" aria-label="David Boateng's Simulations home"><img src="assets/davidblogo.png" alt="" width="640" height="491" /><span class="brand-tag">Simulations</span></a>
+    <nav><a href="index.html" aria-current="page">Simulations</a><a href="about.html">About</a><a href="donate.html">Donate</a></nav>
+  </header>
+
+  <main class="home">
+    <section class="library" aria-label="Simulation library">
+      <label class="search">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="search" type="search" placeholder="Search simulations, e.g. car, physics, racing" autocomplete="off" aria-label="Search simulations" />
+      </label>
+      <div class="lib-bar">
+        <div class="chips" id="chips" aria-label="Filter by tag"></div>
+        <p class="count" id="count"></p>
+      </div>
+      <div class="grid" id="grid" aria-live="polite"></div>
+    </section>
+
+    <aside class="intro">
+      <h1 class="intro-title"><img src="assets/davidblogo.png" alt="DAVID B." width="640" height="491" /><span>Simulations</span></h1>
+      <p>Interactive simulations that run right in your browser. No downloads, no accounts, and nothing is saved. Search the library and press play.</p>
+    </aside>
+  </main>
+
+  <footer class="footer">© 2026 David Boateng · <a href="https://djmboateng.github.io/portfolio/" target="_blank" rel="noopener">Portfolio</a> · <a href="donate.html">Donate</a></footer>
+  <script src="site.js"></script>
+</body>
+</html>

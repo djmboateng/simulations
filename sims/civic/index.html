@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Car Tuning Simulator</title>
+  <meta name="description" content="Tune David Boateng's low-poly 2000 Honda Civic Type R (EK9), then test drive it on 2D tracks or the drag strip." />
+  <link rel="icon" type="image/png" href="../../assets/favicon-davidb.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="sim.css" />
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    } }
+  </script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="back" href="../../index.html" aria-label="Back to all simulations">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+      <span>Simulations</span>
+    </a>
+    <div class="car-title">
+      <span class="car-name"><b>2000</b> HONDA CIVIC TYPE R <em>EK9</em></span>
+      <span class="pi-badge" id="piBadge"><b>C</b><i>520</i></span>
+    </div>
+    <nav class="modes" role="tablist" aria-label="Simulator mode">
+      <button class="mode-btn active" data-mode="garage" role="tab" aria-selected="true">Garage</button>
+      <button class="mode-btn" data-mode="drive" role="tab" aria-selected="false">Test Drive</button>
+      <button class="mode-btn" data-mode="drag" role="tab" aria-selected="false">Drag Race</button>
+    </nav>
+    <button class="icon-btn" id="infoBtn" aria-label="About this car and model" title="About this car">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6M12 7.5v.01"/></svg>
+    </button>
+  </header>
+
+  <main>
+    <!-- GARAGE -->
+    <section class="mode-view active" id="view-garage">
+      <div class="viewport" id="viewport">
+        <div class="loader" id="loader"><div class="loader-bar"><span id="loaderFill"></span></div><p>Rolling the EK9 out of the garage…</p></div>
+      </div>
+
+      <aside class="shop" id="shop">
+        <div class="shop-head">
+          <span class="shop-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3 17.8 6.2 21l6.3-6.3a4 4 0 0 0 5.2-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg></span>
+          <span>UPGRADE SHOP</span>
+        </div>
+        <div class="cat-title" id="catTitle">ENGINE</div>
+        <div class="shop-body">
+          <p class="cat-desc" id="catDesc"></p>
+          <div id="catOptions"></div>
+        </div>
+      </aside>
+
+      <aside class="stats" id="stats">
+        <label class="build-name"><span>Build name</span><input id="buildName" maxlength="40" value="My EK9 Type R" spellcheck="false" /></label>
+        <div class="pi-row">
+          <span class="pi-badge big" id="piBadgeBig"><b>C</b><i>520</i></span>
+          <div class="pi-track"><span id="piFill"></span><i id="piStock"></i></div>
+        </div>
+        <div class="bars" id="bars"></div>
+        <dl class="numbers" id="numbers"></dl>
+      </aside>
+
+      <div class="garage-bottom">
+        <div class="cat-strip" id="catStrip" role="tablist" aria-label="Upgrade categories"></div>
+        <div class="garage-actions">
+          <div class="basket" title="Upgrades installed and build cost">
+            <span class="basket-count"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18l-2 11H5zM8 9l4-6 4 6"/></svg><b id="upgradeCount">0</b></span>
+            <span class="basket-cost"><i>CR</i><b id="buildCost">0</b></span>
+          </div>
+          <button class="btn ghost" id="resetBtn" title="Put every part back to factory spec">Reset to stock</button>
+          <button class="btn ghost" id="spinBtn" aria-pressed="false" title="Slowly rotate the turntable">Turntable</button>
+          <button class="btn ghost" id="photoBtn" title="Download a picture of your build">Save photo</button>
+          <button class="btn ghost" id="reportBtn" title="Download a full tuning report">Tuning report</button>
+          <button class="btn" id="toDriveBtn">Test drive <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TEST DRIVE -->
+    <section class="mode-view" id="view-drive">
+      <aside class="side-panel">
+        <h2>Test Drive</h2>
+        <p class="muted">Your car circles the track on auto-drive. Hold <kbd>Space</kbd> to boost, or switch to manual and drive it yourself.</p>
+        <h3>Track</h3>
+        <div class="track-list" id="trackList"></div>
+        <h3>Options</h3>
+        <label class="toggle"><input type="checkbox" id="optAuto" checked /><span></span>Auto-drive</label>
+        <label class="toggle"><input type="checkbox" id="optGhost" checked /><span></span>Race a stock EK9 ghost</label>
+        <label class="toggle"><input type="checkbox" id="optChase" /><span></span>Chase camera</label>
+        <label class="toggle"><input type="checkbox" id="optKmh" /><span></span>Show km/h</label>
+        <div class="speed-row"><span>Simulation speed</span><div class="speed-seg" id="simSpeed" role="group" aria-label="Simulation speed"><button data-speed="1" aria-pressed="false">1×</button><button data-speed="2" aria-pressed="false">2×</button><button data-speed="3" aria-pressed="true">3×</button><button data-speed="5" aria-pressed="false">5×</button></div></div>
+        <div class="build-changes" id="driveChanges"></div>
+        <div class="keys">
+          <span><kbd>←</kbd><kbd>→</kbd> steer</span><span><kbd>↑</kbd> gas</span><span><kbd>↓</kbd> brake</span>
+          <span><kbd>Space</kbd> boost</span><span><kbd>M</kbd> auto / manual</span><span><kbd>C</kbd> camera</span><span><kbd>R</kbd> reset</span>
+        </div>
+      </aside>
+      <div class="stage" id="driveStage">
+        <canvas id="driveCanvas"></canvas>
+        <div class="hud" id="driveHud">
+          <div class="hud-laps">
+            <div><span>LAP</span><b id="hudLap">1</b></div>
+            <div><span>TIME</span><b id="hudTime">0:00.00</b></div>
+            <div><span>LAST</span><b id="hudLast">--</b></div>
+            <div><span>BEST</span><b id="hudBest">--</b></div>
+            <div class="ghost-best"><span>GHOST BEST</span><b id="hudGhost">--</b></div>
+          </div>
+          <div class="hud-speedo">
+            <div class="mode-tag" id="hudMode">AUTO</div>
+            <div class="speed"><b id="hudSpeed">0</b><span id="hudUnit">MPH</span></div>
+            <div class="gear">GEAR <b id="hudGear">1</b></div>
+            <div class="rpm"><span id="hudRpm"></span></div>
+            <div class="boost" id="hudBoostWrap"><span>BOOST</span><div><i id="hudBoost"></i></div></div>
+          </div>
+          <div class="toast" id="driveToast"></div>
+        </div>
+        <div class="touch-controls" id="touchDrive">
+          <div><button data-k="left" aria-label="Steer left">◀</button><button data-k="right" aria-label="Steer right">▶</button></div>
+          <div><button data-k="boost" class="boost-btn">BOOST</button><button data-k="brake">BRAKE</button><button data-k="gas" class="gas-btn">GAS</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DRAG RACE -->
+    <section class="mode-view" id="view-drag">
+      <aside class="side-panel">
+        <h2>Drag Race</h2>
+        <p class="muted">A quarter mile, side by side. Wait for green, hold <kbd>↑</kbd> to launch and <kbd>Space</kbd> to boost.</p>
+        <h3>Opponent</h3>
+        <div class="opponent-list" id="opponentList"></div>
+        <button class="btn wide" id="stageBtn">Stage the cars</button>
+        <div class="results" id="dragResults"></div>
+      </aside>
+      <div class="stage" id="dragStage">
+        <canvas id="dragCanvas"></canvas>
+        <div class="tree" id="tree" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="toast" id="dragToast"></div>
+        <div class="touch-controls" id="touchDrag">
+          <div></div>
+          <div><button data-k="boost" class="boost-btn">BOOST</button><button data-k="gas" class="gas-btn">GAS</button></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="infoDialog" class="info-dialog">
+    <form method="dialog"><button class="close" aria-label="Close">✕</button></form>
+    <img src="../../assets/civic-type-r-logo.png" alt="Civic Type R" class="info-logo" />
+    <p class="lead">This simulator is built around a low-poly <b>2000 Honda Civic Type R (EK9)</b> that I designed in Onshape back in 10th grade. You can recolor it, lower it, widen it, bolt on wings and even a jet engine, then see how each change affects the car on the track.</p>
+    <p>The 2000 EK9 was a Japan-only 3-door hot hatch and the final year of the first-generation Type R.</p>
+    <div class="spec-grid">
+      <div><h4>Engine &amp; Performance</h4><ul>
+        <li>B16B 1.6L inline-4, DOHC VTEC</li><li>185 PS (182 hp) @ 8,200 rpm</li><li>160 Nm (118 lb-ft) @ 7,500 rpm</li>
+        <li>5-speed close-ratio manual, helical LSD</li><li>0–60 mph ≈ 6.3 s · top speed ≈ 139 mph</li></ul></div>
+      <div><h4>Dimensions &amp; Weight</h4><ul>
+        <li>Curb weight ≈ 1,050–1,070 kg</li><li>4,180 × 1,695 × 1,360 mm</li><li>Wheelbase 2,620 mm</li><li>195/55 R15 tires, 5-lug hubs</li></ul></div>
+      <div><h4>2000 Type R x Spec</h4><ul>
+        <li>Seam-welded high-rigidity chassis</li><li>Red bucket seats, MOMO wheel, aluminum shift knob</li>
+        <li>A/C, power folding mirrors, CD player</li><li>Championship White, Sparkle Silver, Starlight Black Pearl, Sunlight Yellow</li></ul></div>
+    </div>
+    <p class="muted small">The performance numbers are estimates from a simplified physics model, calibrated so the stock car matches the factory figures above.</p>
+  </dialog>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
